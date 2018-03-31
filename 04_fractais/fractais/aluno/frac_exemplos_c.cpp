@@ -42,19 +42,16 @@ void circulos(Pen& p,int lado, int rotacao){
     p.circle(100);
 
 }
-//FLOR AINDA ESTOU TENTANDO FAZER
+//FLOR
 void flor(Pen& p, int lado){
-    int ang =45;
-    if(lado<10){
-            return;
+    if(lado < 10){
+        return;
     }
-    p.walk(lado);
-    p.right(ang);
-    p.walk(-lado);
-    ang = ang * 2;
-
-    for(int i=0.;i<5;i++){
-        flor(p,lado);
+    for (int i=0;i<5;i++) {     //PARA TER 5 LINHAS
+        p.walk(lado);
+        flor(p,lado/3);         //FAZER A RECURSÃO ANDANDO 1/3 DO LADO
+        p.walk(-lado);
+        p.left(144);
     }
 
 
