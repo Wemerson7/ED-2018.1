@@ -43,10 +43,20 @@ void circulos(Pen& p,int lado, int rotacao){
 
 }
 //FLOR AINDA ESTOU TENTANDO FAZER
-void flor(Pen& p, int lado,float ang ){
+void flor(Pen& p, int lado){
+    int ang =45;
     if(lado<10){
             return;
     }
+    p.walk(lado);
+    p.right(ang);
+    p.walk(-lado);
+    ang = ang * 2;
+
+    for(int i=0.;i<5;i++){
+        flor(p,lado);
+    }
+
 
 }
 //QUADRADOS AINDA ESTOU TENTANDO FAZER
