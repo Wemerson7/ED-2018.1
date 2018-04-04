@@ -2,3 +2,6 @@ Minha maior dificuldade foi com a linguagem que era nova para mim, e entender o 
 Eu fiz algumas mudanças e acabei optando por utilizar vector no lugar de lista.
 No começo eu pensei em muitas formas de fazer, mas a medida que testava e não dava certo fui descartando as 
 erradas até sobrar a certa.
+Demorei em média umas 8 horas, pois eu mexia e remexia todos os dias ate conseguir.
+Fiz ele um pouco diferente, pois eu escolhi quando ele daria os 'n' saltos, por exemplo: se a espada estivesse na
+posição 3 ela iria dá 3 saltos e assim em diante.
