@@ -1,3 +1,4 @@
+#include "libs/ed_base.h"
 #include "libs/ed_mat.h"
 
 #include <fstream>
@@ -9,13 +10,21 @@
 
 using namespace std;
 
-int nlinhas = 20;
-int ncolunas = 35;
-
 const char PAREDE = 'k';
 const char ABERTO = 'w';
-const char CAMINHO = 'c';
-const char EMBUSCA = 'r';
+const char EMBUSCA = 'y';
+const char CAMINHO = 'b';
+const char ABATIDO = 'm';
+
+void showMat(matchar& mat, vector<Par> pilha, Par inicio, Par fim){
+    mat_draw(mat);
+    for(Par par : pilha)
+        mat_focus(par, 'c');
+    if(pilha.size() > 0)
+        mat_focus(pilha.back(), 'k');
+    mat_focus(inicio, 'g');
+    mat_focus(fim, 'r');
+}
 
 
 vector<Par> getNeib(Par par){
@@ -26,6 +35,7 @@ vector<Par> getNeib(Par par){
     vizinhos.push_back(Par(par.l, par.c - 1));
     return vizinhos;
 }
+
 int countOpen(matchar &mat, Par par){
     int cont = 0;
     for(auto vizinho : getNeib(par))
@@ -33,53 +43,87 @@ int countOpen(matchar &mat, Par par){
             cont++;
     return cont;
 }
+
 vector<Par> shuffle(vector<Par> vet){
     std::random_shuffle(vet.begin(), vet.end());
     return vet;
 }
-void furar(matchar &mat, Par par){
-    if(!mat.equals(par, PAREDE) || countOpen(mat, par) > 1)
-        return;
-    mat.get(par) = FURADO;
-    for(Par vizinho : shuffle(getNeib(par)))
-        furar(mat, vizinho);
+
+bool findPath(matchar& mat, Par inicio, Par final){
+    vector<Par> pilha;
+    pilha.push_back(inicio);
+    mat.get(inicio) = EMBUSCA;
+
+    while(pilha.size() != 0){
+        Par topo = pilha.back();
+        if(topo == final){
+            showMat(mat, pilha, inicio, final);
+            ed_show();
+            return true;
+        }
+        vector<Par> viz_abertos;
+        showMat(mat, pilha, inicio, final);
+        for(Par par : getNeib(topo)){
+            if(mat.get(par) == ABERTO){
+                viz_abertos.push_back(par);
+                mat_focus(par, 'r');
+            }
+        }
+        ed_show();
+        if(viz_abertos.size() == 0){
+            pilha.pop_back();
+            showMat(mat, pilha, inicio, final);
+            ed_show();
+        }else{
+            Par escolhido = viz_abertos[rand() % viz_abertos.size()];
+            mat.get(escolhido) = EMBUSCA;
+            pilha.push_back(escolhido);
+            showMat(mat, pilha, inicio, final);
+            ed_show();
+        }
+    }
+    showMat(mat, pilha, inicio, final);
+    ed_show();
+    return false;
 }
 
+ void furar(matriz<char>& mat,Par inicio){
+    vector<Par> pilha;
+    pilha.push_back(inicio);
+    mat.get(inicio)=ABERTO;
 
-bool findPath(matchar& mat, Par atual, Par final){
-       if(mat.get(atual) ==  final){
-           mat.get(atual) = CAMINHO;
-           return true;
-       }
-       if(mat.get(atual) != ABERTO){
-           return false;
-       }else{
-           mat.get(atual) = EMBUSCA;
+    while(pilha.size()!=0){
+        vector<Par> podeSerFurado;
+        Par topo = pilha.back();
+        for(auto vizinhos:getNeib(topo))
+            if(countOpen(mat,vizinhos)<=1 && mat.equals(vizinhos,PAREDE))
+               podeSerFurado.push_back(vizinhos);
+
+        if(podeSerFurado.size()!=0){
+            int vizinho = rand() % podeSerFurado.size();
+            mat.get(podeSerFurado[vizinho])=ABERTO;
+            pilha.push_back(podeSerFurado[vizinho]);
+            mat_draw(mat);
+            ed_show();
+        }else{
+            pilha.pop_back();
+        }
+    }
+ }
 
 
-       }
-
-
-
-
-}
 
 #include <cstdlib>
 #include <ctime>
 int main(){
     srand(time(NULL));
-    matchar mat(15, 20, PAREDE);
-    furar(mat, Par(1, 1));//chama a função recursiva
-    mat_draw(mat);
-    ed_show();
+    matchar mat(10, 15, PAREDE);
+    furar(mat, Par(1,1));//chama a pilha
     Par inicio = mat_get_click(mat, "digite o local de inicio");
-    mat.get(inicio) = 'g';
     Par final = mat_get_click(mat, "digite o local de fim");
-    mat.get(final) = 'r';
     mat_draw(mat);
     ed_show();
+    findPath(mat, inicio, final);
     ed_lock();//impede que termine abruptamente
     return 0;
 }
-
-
