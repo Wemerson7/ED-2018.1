@@ -1,6 +1,9 @@
 #include "libs/ed_base.h"
 #include "libs/ed_mat.h"
 
+
+#include <cstdlib>
+#include <ctime>
 #include <fstream>
 #include <iostream>
 #include <cstdlib>
@@ -51,33 +54,34 @@ vector<Par> shuffle(vector<Par> vet){
 
 bool findPath(matchar& mat, Par inicio, Par final){
     vector<Par> pilha;
-    pilha.push_back(inicio);
-    mat.get(inicio) = EMBUSCA;
+    pilha.push_back(inicio); //PRIMEIRO ELEMENTO NA PILHA É O INICIO
+    mat.get(inicio) = EMBUSCA;//MARCA O INICIO
 
-    while(pilha.size() != 0){
-        Par topo = pilha.back();
-        if(topo == final){
+    while(pilha.size() != 0){//ENQUANTO TIVER ALGUEM NA PILHA FAÇA ISSO
+        Par topo = pilha.back();//TOPO VAI SER O ULTIMO ELEMENTO NA PILHA
+        if(topo == final){//SE FOR ACABOU, É FESTA
             showMat(mat, pilha, inicio, final);
             ed_show();
             return true;
         }
+        //SE NAO FOR...
         vector<Par> viz_abertos;
         showMat(mat, pilha, inicio, final);
-        for(Par par : getNeib(topo)){
+        for(Par par : getNeib(topo)){//PEGANDO TODOS OS VIZINHOS DO TOPO
             if(mat.get(par) == ABERTO){
-                viz_abertos.push_back(par);
+                viz_abertos.push_back(par);//GUARDANDO OS VIZINHOS ABERTOS
                 mat_focus(par, 'r');
             }
         }
         ed_show();
-        if(viz_abertos.size() == 0){
-            pilha.pop_back();
+        if(viz_abertos.size() == 0){//SE NAO TIVER VIZINHO ABERTO
+            pilha.pop_back();//DESIMPILHA DA PILHA
             showMat(mat, pilha, inicio, final);
             ed_show();
-        }else{
-            Par escolhido = viz_abertos[rand() % viz_abertos.size()];
-            mat.get(escolhido) = EMBUSCA;
-            pilha.push_back(escolhido);
+        }else{//SE TIVER
+            Par escolhido = viz_abertos[rand() % viz_abertos.size()];//ESCOLHE UMA POSIÇÃO ALEATÓRIA
+            mat.get(escolhido) = EMBUSCA;//E COMEÇA MARCANDO ELA
+            pilha.push_back(escolhido);//E EMPILHANDO NA PILHA
             showMat(mat, pilha, inicio, final);
             ed_show();
         }
@@ -89,35 +93,32 @@ bool findPath(matchar& mat, Par inicio, Par final){
 
  void furar(matriz<char>& mat,Par inicio){
     vector<Par> pilha;
-    pilha.push_back(inicio);
-    mat.get(inicio)=ABERTO;
+    pilha.push_back(inicio);//EMPILHANDO A PRIMEIRA COORDENADA NA PILHA
+    mat.get(inicio)=ABERTO; //MARCAR O CAMINHO QUE PASSO
 
     while(pilha.size()!=0){
         vector<Par> podeSerFurado;
-        Par topo = pilha.back();
-        for(auto vizinhos:getNeib(topo))
-            if(countOpen(mat,vizinhos)<=1 && mat.equals(vizinhos,PAREDE))
-               podeSerFurado.push_back(vizinhos);
+        Par topo = pilha.back(); //O TOPO VAI SER O ULTIMO VALOR DA PILHA
+        for(auto vizinhos:getNeib(topo)) //PEGAR OS VIZINHOS DO TOPO
+            if(countOpen(mat,vizinhos)<=1 && mat.equals(vizinhos,PAREDE)) //SABENDO QUEM SÃO OS VIZINHOS QUE PODEM SER ABERTOS
+               podeSerFurado.push_back(vizinhos);//ADICIONANDO NUMA LISTA OS VIZINHOS Q PODEM SER FURADOS
 
         if(podeSerFurado.size()!=0){
-            int vizinho = rand() % podeSerFurado.size();
-            mat.get(podeSerFurado[vizinho])=ABERTO;
-            pilha.push_back(podeSerFurado[vizinho]);
+            int vizinho = rand() % podeSerFurado.size(); //SORTEANDO ALGUMA PARA PEGAR OS VIZINHOS
+            mat.get(podeSerFurado[vizinho]) = ABERTO;//MARCANDO O VIZINHO
+            pilha.push_back(podeSerFurado[vizinho]);//EMPILHANDO ESSE VIZINHO NA PILHA
             mat_draw(mat);
             ed_show();
         }else{
-            pilha.pop_back();
+            pilha.pop_back();//DESIMPILHA A PILHA
         }
     }
  }
 
 
-
-#include <cstdlib>
-#include <ctime>
 int main(){
     srand(time(NULL));
-    matchar mat(10, 15, PAREDE);
+    matchar mat(20, 15, PAREDE);
     furar(mat, Par(1,1));//chama a pilha
     Par inicio = mat_get_click(mat, "digite o local de inicio");
     Par final = mat_get_click(mat, "digite o local de fim");
